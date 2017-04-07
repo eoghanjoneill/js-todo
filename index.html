@@ -13,7 +13,11 @@
   <section id="toDoList">
     <h3>The List</h3>    
   </section>
-  <form id="newTask"></form>
+  <form id="newTask">
+    Category: <select id="categoryChooser" required></select><br>
+    Task: <input type="text" id="taskName" required><br>
+    <input type="submit" value="Add new task">
+  </form>
   <script src="js/script.js"></script>
 </body>
 </html>
