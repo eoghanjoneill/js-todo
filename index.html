@@ -10,14 +10,28 @@
   <header>
     <h1>To Do List for the Masses</h1>
   </header>
-  <section id="toDoList">
-    <h3>The List</h3>    
-  </section>
-  <form id="newTask">
-    Category: <select id="categoryChooser" required></select><br>
-    Task: <input type="text" id="taskName" required><br>
-    <input type="submit" value="Add new task">
+
+  <form id="newTaskForm">
+    <p>
+      <label for="categoryChooser">Category:</label>
+      <input type="text" id="categoryChooser" list="usedCategories" required>
+      <datalist id="usedCategories">
+      </datalist>
+      <label for="taskName">Task:</label>
+      <input type="text" id="newTask" required>
+      <button type="submit" id="saveTask">Add new task</button>
+    </p>
+    <p>
+      <button type="button" id="createDummyTasks">Create dummy tasks</button>
+      <button type="button" id="clearStorage">Clear all tasks</button>
+    </p>
   </form>
-  <script src="js/script.js"></script>
+
+  <section>
+    <h4>The List Itself</h4>
+    <ul id="toDoList"></ul>
+  </section>
+
+  <script src="js/toDoList.js"></script>
 </body>
 </html>
