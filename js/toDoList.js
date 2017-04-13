@@ -3,7 +3,7 @@
 (function(){
   "use strict";  
   
-  var $form, $toDoList;
+  var $form, $toDoList, allTasks = [];
 
   //entry point
   (function initialise() {
@@ -19,7 +19,7 @@
     });
     $toDoList = document.getElementById("toDoList");
     
-    populateCategories();
+    populateCategoryCombo();
     refreshList();  
   })();
 
@@ -34,14 +34,14 @@
   }
   
   //functions
-  function populateCategories() {
+  function populateCategoryCombo() {
     var categories = getCategories();
     categories.forEach(function(cat) {
-      addCatToOptions(cat);
+      addCatToCombo(cat);
     });
   }
 
-  function addCatToOptions(cat) {
+  function addCatToCombo(cat) {
     var el, $catOptions;
     $catOptions = document.getElementById("usedCategories");    
     el = document.createElement("option");
@@ -68,10 +68,9 @@
     var newTask = new ToDoTask($newTask.value, $catSelect.value);
     addItemToList(newTask);    
     saveItemToStorage(newTask);
-    addCatToOptions($catSelect.value);
+    addCatToCombo($catSelect.value);
     $newTask.value = "";    
   }
-
   
   function refreshList() {
     var toDoList = getSavedList();
@@ -93,17 +92,20 @@
   }
 
   function saveItemToStorage(task) {
-    //use timestamp as key - update task if it already exists    
+    //use timestamp as key - update task if it already exists
+    allTasks.push(task);   
     localStorage.setItem(task.name + "_" + task.dateCreated, JSON.stringify(task));
   }
 
-  function getSavedList() {
-    var allTasks = [];
-    var i = localStorage.length;
-    while (i--) {
-      allTasks.push(JSON.parse(localStorage.getItem(localStorage.key(i))));
+  function getSavedList(refreshFromStorage) {
+    if (!allTasks.length || refreshFromStorage) {
+      var i = localStorage.length;
+      while (i--) {
+        allTasks.push(JSON.parse(localStorage.getItem(localStorage.key(i))));
+      }
+      allTasks.sort((x,y) => x.dateCreated >= y.dateCreated);
     }
-    allTasks.sort((x,y) => x.dateCreated >= y.dateCreated);
+    
     return allTasks;
   }
 
