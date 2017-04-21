@@ -12,13 +12,9 @@
     var $createDummyTasks = document.getElementById("createDummyTasks");
     $createDummyTasks.addEventListener("click", createDummyTasks);
     var $clearTasks = document.getElementById("clearStorage");
-    $clearTasks.addEventListener("click", function(e) {
-      e.preventDefault();
-      localStorage.clear();
-      refreshList();
-    });
+    $clearTasks.addEventListener("click", clearTasks);
     $toDoList = document.getElementById("toDoList");
-    
+    window.addEventListener("storage", storageHandler);
     populateCategoryCombo();
     refreshList();  
   })();
@@ -33,6 +29,28 @@
     this.dateCreated = dateCreated === undefined ? Date.now() : dateCreated;    
   }
   
+  //event handlers
+  function saveTaskHandler(evt) {
+    evt.preventDefault();
+    var $newTask = document.getElementById("newTask");
+    var $catSelect = document.getElementById("categoryChooser");
+    var newTask = new ToDoTask($newTask.value, $catSelect.value);
+    addItemToList(newTask);    
+    saveItemToStorage(newTask);
+    addCatToCombo($catSelect.value);
+    $newTask.value = "";    
+  }
+
+  function storageHandler(evt) {
+    location.reload();
+  }
+
+  function clearTasks(evt) {
+      evt.preventDefault();
+      localStorage.clear();
+      refreshList();
+  }
+
   //functions
   function populateCategoryCombo() {
     var categories = getCategories();
@@ -60,17 +78,6 @@
     allCats.sort((a, b) => a < b);
     return allCats;
   }  
-
-  function saveTaskHandler(evt) {
-    evt.preventDefault();
-    var $newTask = document.getElementById("newTask");
-    var $catSelect = document.getElementById("categoryChooser");
-    var newTask = new ToDoTask($newTask.value, $catSelect.value);
-    addItemToList(newTask);    
-    saveItemToStorage(newTask);
-    addCatToCombo($catSelect.value);
-    $newTask.value = "";    
-  }
   
   function refreshList() {
     var toDoList = getSavedList();
