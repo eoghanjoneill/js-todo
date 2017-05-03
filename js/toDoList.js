@@ -14,9 +14,10 @@
     var $clearTasks = document.getElementById("clearStorage");
     $clearTasks.addEventListener("click", clearTasks);
     $toDoList = document.getElementById("toDoList");
+    $toDoList.addEventListener("click", taskDoneHandler);
     window.addEventListener("storage", storageHandler);
     populateCategoryCombo();
-    refreshList();  
+    refreshList();
   })();
 
 
@@ -38,7 +39,11 @@
     addItemToList(newTask);    
     saveItemToStorage(newTask);
     addCatToCombo($catSelect.value);
-    $newTask.value = "";    
+    $newTask.value = "";
+  }
+
+  function taskDoneHandler(evt) {
+    
   }
 
   function storageHandler(evt) {

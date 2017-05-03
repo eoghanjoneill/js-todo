@@ -1,0 +1,19 @@
+body {
+    font-family: Courier New, Courier, monospace;
+    font-size: 100%;
+    padding: 0;
+    margin: 10px 0 50px 10px;
+}
+
+button {
+    font-family: Courier New, Courier, monospace;
+
+}
+
+h1 {
+    text-transform: uppercase;
+}
+
+.completed {
+    text-decoration-line: line-through;
+}
