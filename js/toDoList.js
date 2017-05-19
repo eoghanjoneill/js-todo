@@ -21,7 +21,7 @@
 
 
   //Constructors
-  function ToDoTask(name, category, dueDate, done, dateCreated) {
+  function ToDoTask({name, category, dueDate, done, dateCreated}) {
     this.name = name;
     this.category = category === undefined ? "" : category;    
     this.dueDate = dueDate === undefined ? null : dueDate;
@@ -34,7 +34,7 @@
     evt.preventDefault();
     var $newTask = document.getElementById("newTask");
     var $catSelect = document.getElementById("categoryChooser");
-    var newTask = new ToDoTask($newTask.value, $catSelect.value);
+    var newTask = new ToDoTask({name: $newTask.value, category: $catSelect.value});
     addItemToList(newTask);    
     saveItemToStorage(newTask);
     addCatToCombo($catSelect.value);
@@ -119,9 +119,12 @@
   function createDummyTasks(evt) {
     evt.preventDefault();
 
-    var task1 = new ToDoTask("Learn JavaScript", "Dev");
-    var task2 = new ToDoTask("Learn Node.js", "Dev");
-    var task3 = new ToDoTask("Plant out sunflower seeds", "Garden");
+    var task1 = new ToDoTask({name: "Learn JavaScript",
+      category: "Dev"});
+    var task2 = new ToDoTask({name: "Learn Node.js",
+      category: "Dev"});
+    var task3 = new ToDoTask({name: "Plant out sunflower seeds",
+      category: "Garden"});
     saveItemToStorage(task1);
     saveItemToStorage(task2);
     saveItemToStorage(task3);
