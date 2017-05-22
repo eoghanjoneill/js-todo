@@ -3,6 +3,20 @@
 (function(){
   "use strict";  
   
+  var view = (function() {
+
+    function addCatToCombo(cat) {
+      var el, $catOptions;
+      $catOptions = document.getElementById("usedCategories");    
+      el = document.createElement("option");
+      el.textContent = cat;
+      $catOptions.appendChild(el);
+    }
+
+    return {addCatToCombo : addCatToCombo};
+  }());
+   
+
   var $form, $toDoList, allTasks = [];
 
   //entry point
@@ -38,7 +52,7 @@
     var newTask = new ToDoTask($newTask.value, $catSelect.value);
     addItemToList(newTask);    
     saveItemToStorage(newTask);
-    addCatToCombo($catSelect.value);
+    view.addCatToCombo($catSelect.value);
     $newTask.value = "";
   }
 
@@ -64,13 +78,7 @@
     });
   }
 
-  function addCatToCombo(cat) {
-    var el, $catOptions;
-    $catOptions = document.getElementById("usedCategories");    
-    el = document.createElement("option");
-    el.textContent = cat;
-    $catOptions.appendChild(el);
-  }
+  
 
   function getCategories() {
     //get the unique list of used categories, plus add a few
