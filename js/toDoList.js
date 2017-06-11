@@ -7,13 +7,32 @@
 
     function addCatToCombo(cat) {
       var el, $catOptions;
-      $catOptions = document.getElementById("usedCategories");    
+      $catOptions = document.getElementById("usedCategories");
       el = document.createElement("option");
       el.textContent = cat;
       $catOptions.appendChild(el);
     }
 
-    return {addCatToCombo : addCatToCombo};
+    function refreshList() {
+      var toDoList = getSavedList();
+      $toDoList.innerHTML = "";
+      toDoList.forEach(function(element) {
+        addItemToList(element);
+      }, this);    
+    }
+  
+    function addItemToList(task) {
+      var li = document.createElement("li");
+      li.value = task.name + "_" + task.dateCreated;
+      li.textContent = `Category: ${task.category}, Task: ${task.name}`;
+      if ($toDoList.hasChildNodes()) {
+        $toDoList.insertBefore(li, $toDoList.firstChild);
+      } else {
+        $toDoList.appendChild(li);
+      }
+    }
+
+    return {addCatToCombo : addCatToCombo, refreshList : refreshList, addItemToList : addItemToList};
   }());
    
 
@@ -34,6 +53,7 @@
     refreshList();
   })();
 
+//Model
 
   //Constructors
   function ToDoTask(name, category, dueDate, done, dateCreated) {
@@ -44,6 +64,11 @@
     this.dateCreated = dateCreated === undefined ? Date.now() : dateCreated;    
   }
   
+
+var controller = (function() {
+  function watch() {
+    
+  }
   //event handlers
   function saveTaskHandler(evt) {
     evt.preventDefault();
@@ -70,6 +95,11 @@
       refreshList();
   }
 
+
+}());
+
+  
+
   //functions
   function populateCategoryCombo() {
     var categories = getCategories();
@@ -92,24 +122,7 @@
     return allCats;
   }  
   
-  function refreshList() {
-    var toDoList = getSavedList();
-    $toDoList.innerHTML = "";
-    toDoList.forEach(function(element) {
-      addItemToList(element);
-    }, this);    
-  }
   
-  function addItemToList(task) {
-    var li = document.createElement("li");
-    li.value = task.name + "_" + task.dateCreated;
-    li.textContent = `Category: ${task.category}, Task: ${task.name}`;
-    if ($toDoList.hasChildNodes()) {
-      $toDoList.insertBefore(li, $toDoList.firstChild);
-    } else {
-      $toDoList.appendChild(li);
-    }
-  }
 
   function saveItemToStorage(task) {
     //use timestamp as key - update task if it already exists
