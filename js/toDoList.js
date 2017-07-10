@@ -3,6 +3,39 @@
 (function(){
   "use strict";  
   
+  var view = (function() {
+
+    function addCatToCombo(cat) {
+      var el, $catOptions;
+      $catOptions = document.getElementById("usedCategories");
+      el = document.createElement("option");
+      el.textContent = cat;
+      $catOptions.appendChild(el);
+    }
+
+    function refreshList() {
+      var toDoList = getSavedList();
+      $toDoList.innerHTML = "";
+      toDoList.forEach(function(element) {
+        addItemToList(element);
+      }, this);    
+    }
+  
+    function addItemToList(task) {
+      var li = document.createElement("li");
+      li.value = task.name + "_" + task.dateCreated;
+      li.textContent = `Category: ${task.category}, Task: ${task.name}`;
+      if ($toDoList.hasChildNodes()) {
+        $toDoList.insertBefore(li, $toDoList.firstChild);
+      } else {
+        $toDoList.appendChild(li);
+      }
+    }
+
+    return {addCatToCombo : addCatToCombo, refreshList : refreshList, addItemToList : addItemToList};
+  }());
+   
+
   var $form, $toDoList, allTasks = [];
 
   //entry point
@@ -20,6 +53,7 @@
     refreshList();
   })();
 
+//Model
 
   //Constructors
   function ToDoTask({name, category, dueDate, done, dateCreated}) {
@@ -30,6 +64,11 @@
     this.dateCreated = dateCreated === undefined ? Date.now() : dateCreated;    
   }
   
+
+var controller = (function() {
+  function watch() {
+    
+  }
   //event handlers
   function saveTaskHandler(evt) {
     evt.preventDefault();
@@ -38,7 +77,7 @@
     var newTask = new ToDoTask({name: $newTask.value, category: $catSelect.value});
     addItemToList(newTask);    
     saveItemToStorage(newTask);
-    addCatToCombo($catSelect.value);
+    view.addCatToCombo($catSelect.value);
     $newTask.value = "";
   }
 
@@ -56,6 +95,11 @@
       refreshList();
   }
 
+
+}());
+
+  
+
   //functions
   function populateCategoryCombo() {
     var categories = getCategories();
@@ -64,13 +108,7 @@
     });
   }
 
-  function addCatToCombo(cat) {
-    var el, $catOptions;
-    $catOptions = document.getElementById("usedCategories");    
-    el = document.createElement("option");
-    el.textContent = cat;
-    $catOptions.appendChild(el);
-  }
+  
 
   function getCategories() {
     //get the unique list of used categories, plus add a few
@@ -84,24 +122,7 @@
     return allCats;
   }  
   
-  function refreshList() {
-    var toDoList = getSavedList();
-    $toDoList.innerHTML = "";
-    toDoList.forEach(function(element) {
-      addItemToList(element);
-    }, this);    
-  }
   
-  function addItemToList(task) {
-    var li = document.createElement("li");
-    li.value = task.name + "_" + task.dateCreated;
-    li.textContent = `Category: ${task.category}, Task: ${task.name}`;
-    if ($toDoList.hasChildNodes()) {
-      $toDoList.insertBefore(li, $toDoList.firstChild);
-    } else {
-      $toDoList.appendChild(li);
-    }
-  }
 
   function saveItemToStorage(task) {
     //use timestamp as key - update task if it already exists
