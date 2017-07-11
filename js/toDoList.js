@@ -32,29 +32,56 @@
       }
     }
 
-    return {addCatToCombo : addCatToCombo, refreshList : refreshList, addItemToList : addItemToList};
+    return {
+      addCatToCombo : addCatToCombo, refreshList : refreshList, addItemToList : addItemToList,
+      form : document.getElementById("newTaskForm"),
+      createDummyTasks : document.getElementById("createDummyTasks"),
+      clearTasks : document.getElementById("clearStorage"),
+      toDoList : document.getElementById("toDoList"),
+      newTask : document.getElementById("newTask"),
+      catSelect : document.getElementById("categoryChooser")
+    };
   }());
-   
+    
 
-  var $form, $toDoList, allTasks = [];
+  //Model
+  function ToDoList() {
+    "use strict";    
 
-  //entry point
-  (function initialise() {
-    $form = document.getElementById("newTaskForm");
-    $form.addEventListener("submit", saveTaskHandler);
-    var $createDummyTasks = document.getElementById("createDummyTasks");
-    $createDummyTasks.addEventListener("click", createDummyTasks);
-    var $clearTasks = document.getElementById("clearStorage");
-    $clearTasks.addEventListener("click", clearTasks);
-    $toDoList = document.getElementById("toDoList");
-    $toDoList.addEventListener("click", taskDoneHandler);
-    window.addEventListener("storage", storageHandler);
-    populateCategoryCombo();
-    refreshList();
-  })();
+    this.allTasks = []; //initialise task array
+    
+  }
 
-//Model
+  ToDoList.prototype.getTaskList = function (forceRefresh) {
+    if (!this.allTasks.length || refreshFromStorage) {
+      var i = localStorage.length;
+      while (i--) {
+        this.allTasks.push(JSON.parse(localStorage.getItem(localStorage.key(i))));
+      }
+      this.allTasks.sort((x,y) => x.dateCreated >= y.dateCreated);
+    }
+    
+    return this.allTasks;
+  }
 
+  ToDoList.prototype.getCategories = function (taskList) {
+    //get the unique list of used categories, plus add a few
+    let allCats = taskList.map(task => task.category);
+    allCats.forEach(x=>console.log(x));
+    allCats = allCats.filter((cat, i, arr) => arr.indexOf(cat) === i);//remove duplicates
+    if (allCats.filter(x => x.toLowerCase().trim() === "general") !== -1) {
+      allCats.unshift("General");
+    }
+    allCats.sort((a, b) => a < b);
+    return allCats;
+  }   
+
+  ToDoList.prototype.saveItem = function(task) {
+    //use timestamp as key - update task if it already exists
+    allTasks.push(task);   
+    localStorage.setItem(task.name + "_" + task.dateCreated, JSON.stringify(task));
+  }
+  
   //Constructors
   function ToDoTask({name, category, dueDate, done, dateCreated}) {
     this.name = name;
@@ -64,99 +91,73 @@
     this.dateCreated = dateCreated === undefined ? Date.now() : dateCreated;    
   }
   
-
-var controller = (function() {
-  function watch() {
-    
-  }
-  //event handlers
-  function saveTaskHandler(evt) {
-    evt.preventDefault();
-    var $newTask = document.getElementById("newTask");
-    var $catSelect = document.getElementById("categoryChooser");
-    var newTask = new ToDoTask({name: $newTask.value, category: $catSelect.value});
-    addItemToList(newTask);    
-    saveItemToStorage(newTask);
-    view.addCatToCombo($catSelect.value);
-    $newTask.value = "";
-  }
-
-  function taskDoneHandler(evt) {
-    
-  }
-
-  function storageHandler(evt) {
-    location.reload();
-  }
-
-  function clearTasks(evt) {
-      evt.preventDefault();
-      localStorage.clear();
-      refreshList();
-  }
-
-
-}());
-
+  //Controller
+  function Controller(model, view) {
   
-
-  //functions
-  function populateCategoryCombo() {
-    var categories = getCategories();
-    categories.forEach(function(cat) {
-      addCatToCombo(cat);
+    var self = this;
+    self.model = model;
+    self.view = view;
+    //populate categories in the view
+    self.model.getCategories(self.model.getTaskList()).forEach(function(cat) {
+      self.view.addCatToCombo(cat);
     });
-  }
 
-  
+    view.form.addEventListener("submit", saveTaskHandler);
+    view.createDummyTasks.addEventListener("click", createDummyTasks);
+    view.clearTasks.addEventListener("click", clearTasksHandler);
+    view.toDoList.addEventListener("click", taskDoneHandler);
+    window.addEventListener("storage", storageHandler);
+    view.refreshList();
 
-  function getCategories() {
-    //get the unique list of used categories, plus add a few
-    var allCats = getSavedList().map(task => task.category);
-    allCats.forEach(x=>console.log(x));
-    allCats = allCats.filter((cat, i, arr) => arr.indexOf(cat) === i);//remove duplicates
-    if (allCats.filter(x => x.toLowerCase().trim() === "general") !== -1) {
-      allCats.unshift("General");
-    }
-    allCats.sort((a, b) => a < b);
-    return allCats;
-  }  
-  
-  
-
-  function saveItemToStorage(task) {
-    //use timestamp as key - update task if it already exists
-    allTasks.push(task);   
-    localStorage.setItem(task.name + "_" + task.dateCreated, JSON.stringify(task));
-  }
-
-  function getSavedList(refreshFromStorage) {
-    if (!allTasks.length || refreshFromStorage) {
-      var i = localStorage.length;
-      while (i--) {
-        allTasks.push(JSON.parse(localStorage.getItem(localStorage.key(i))));
-      }
-      allTasks.sort((x,y) => x.dateCreated >= y.dateCreated);
-    }
+    //event handlers
+    function saveTaskHandler(evt) {
+      evt.preventDefault();    
     
-    return allTasks;
-  }
+      var newTask = new ToDoTask({name: self.view.newTask.value, category: self.view.catSelect.value});
+      self.view.addItemToList(newTask);    
+      self.model.saveItemToStorage(newTask);
+      self.view.addCatToCombo($catSelect.value);
+      self.view.newTask.value = "";
+    }
 
-  function createDummyTasks(evt) {
-    evt.preventDefault();
+    function taskDoneHandler(evt) {
+      
+    }
 
-    var task1 = new ToDoTask({name: "Learn JavaScript",
-      category: "Dev"});
-    var task2 = new ToDoTask({name: "Learn Node.js",
-      category: "Dev"});
-    var task3 = new ToDoTask({name: "Plant out sunflower seeds",
-      category: "Garden"});
-    saveItemToStorage(task1);
-    saveItemToStorage(task2);
-    saveItemToStorage(task3);
+    function storageHandler(evt) {
+      location.reload();
+    }
+
+    function clearTasksHandler(evt) {
+        evt.preventDefault();
+        localStorage.clear();
+        self.view.refreshList();
+    }
+
+    function createDummyTasks(evt) {
+      evt.preventDefault();
+
+      var task1 = new ToDoTask({name: "Learn JavaScript",
+        category: "Dev"});
+      var task2 = new ToDoTask({name: "Learn Node.js",
+        category: "Dev"});
+      var task3 = new ToDoTask({name: "Plant out sunflower seeds",
+        category: "Garden"});
+      model.saveItemToStorage(task1);
+      model.saveItemToStorage(task2);
+      model.saveItemToStorage(task3);
+      
+      self.view.refreshList();
+    }   
+  } 
+
+  //entry point
+  (function initialise() {
+    var model = new ToDoList();
+    var controller = new Controller(model, view);   
     
-    refreshList();
-  }
+  })();
+  
   
 })();
 
