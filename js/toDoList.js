@@ -3,67 +3,61 @@
 (function(){
   "use strict";  
   
-  //for the view we're using the Module pattern, rather than the Constructor pattern, for object creation
-  var view = (function() {
+  //View using constructor pattern
+  function View() {
     
-    function addCatToCombo(cat) {
-      var el, $catOptions, optionFound = false;
-      $catOptions = document.getElementById(self.$catSelect.list.id);
-      for (var j = 0; j < $catOptions.options.length; j++) {
-        if (cat == $catOptions.options[j].innerHTML) {
-          optionFound = true;
-          break;
-        }
-      }
-      if (!optionFound) {
-        el = document.createElement("option");
-        el.textContent = cat;
-        $catOptions.appendChild(el);
-      }      
-    }
+    this.$form = document.getElementById("newTaskForm");
+    this.$createDummyTasks = document.getElementById("createDummyTasks");
+    this.$clearTasks = document.getElementById("clearStorage");
+    this.$toDoList = document.getElementById("toDoList");
+    this.$newTask = document.getElementById("newTask");
+    this.$catSelect = document.getElementById("categoryChooser");    
+  }
 
-    function refreshList(toDoList) {      
-      view.$toDoList.innerHTML = "";
-      toDoList.forEach(function(element) {
-        addItemToList(element);
-      }, this);    
-    }
-  
-    function addItemToList(task) {
-      var li = document.createElement("li");
-      li.id = task.toString();
-      li.textContent = `Category: ${task.category}, Task: ${task.name}`;
-      setTaskDoneFlag(li, task.done);
-      if (view.$toDoList.hasChildNodes()) {
-        view.$toDoList.insertBefore(li, view.$toDoList.firstChild);
-      } else {
-        view.$toDoList.appendChild(li);
+  View.prototype.addCatToCombo = function (cat) {
+    var el, $catOptions, optionFound = false;
+    $catOptions = document.getElementById(this.$catSelect.list.id);
+    for (var j = 0; j < $catOptions.options.length; j++) {
+      if (cat == $catOptions.options[j].innerHTML) {
+        optionFound = true;
+        break;
       }
     }
+    if (!optionFound) {
+      el = document.createElement("option");
+      el.textContent = cat;
+      $catOptions.appendChild(el);
+    }      
+  }
 
-    function setTaskDoneFlag(listItem, isDone) {
-      if (isDone) {
-        listItem.classList.add("completed");
-      }
-      else {
-        listItem.classList.remove("completed");
-      }
+  View.prototype.refreshList = function (toDoList) { 
+    this.$toDoList.innerHTML = "";
+    toDoList.forEach(function(element) {
+      this.addItemToList(element);
+    }, this);    
+  }
+
+  View.prototype.addItemToList = function (task) {
+    var li = document.createElement("li");
+    li.id = task.toString();
+    li.textContent = `Category: ${task.category}, Task: ${task.name}`;
+    this.setTaskDoneFlag(li, task.done);
+    if (this.$toDoList.hasChildNodes()) {
+      this.$toDoList.insertBefore(li, this.$toDoList.firstChild);
+    } else {
+      this.$toDoList.appendChild(li);
     }
+  }
 
-    var self = {
-      addCatToCombo : addCatToCombo, refreshList : refreshList,
-      addItemToList : addItemToList, toggleTaskDoneFlag : setTaskDoneFlag,
-      $form : document.getElementById("newTaskForm"),
-      $createDummyTasks : document.getElementById("createDummyTasks"),
-      $clearTasks : document.getElementById("clearStorage"),
-      $toDoList : document.getElementById("toDoList"),
-      $newTask : document.getElementById("newTask"),
-      $catSelect : document.getElementById("categoryChooser")
-    };
+  View.prototype.setTaskDoneFlag = function (listItem, isDone) {
+    if (isDone) {
+      listItem.classList.add("completed");
+    }
+    else {
+      listItem.classList.remove("completed");
+    }
+  }
 
-    return self;
-  }());
-    
 
   //Model - using the Constructor pattern, adding functions to the prototype
   function ToDoList() {
@@ -150,7 +144,7 @@
   }
 
   //Controller Constructor function
-  function Controller(model) {
+  function Controller(model, view) {
   
     var self = this;
     self.model = model;
@@ -193,7 +187,7 @@
           let task = self.model.getTaskById(li.id);
           task.done = !task.done;
           model.saveItem(task);
-          view.toggleTaskDoneFlag(li, task.done);
+          view.setTaskDoneFlag(li, task.done);
         }
         else if (li.id === "toDoList" || li.nodeName.toLowerCase() === "html")
           foundItOrList = true;
@@ -230,9 +224,10 @@
   } 
 
   //entry point
-  (function initialise() {
+  (function initialise() {    
     var model = new ToDoList();
-    var controller = new Controller(model);   
+    var view = new View();
+    var controller = new Controller(model, view);
     
   })();
   
