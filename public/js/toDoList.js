@@ -31,30 +31,32 @@
   }
 
   View.prototype.refreshList = function (toDoList) { 
-    this.$toDoList.innerHTML = "";
+    this.$toDoList.tBodies[0].innerHTML = "";
     toDoList.forEach(function(element) {
       this.addItemToList(element);
     }, this);    
   }
 
   View.prototype.addItemToList = function (task) {
-    var li = document.createElement("li");
-    li.id = task.toString();
-    li.textContent = `Category: ${task.category}, Task: ${task.name}`;
-    this.setTaskDoneFlag(li, task.done);
-    if (this.$toDoList.hasChildNodes()) {
-      this.$toDoList.insertBefore(li, this.$toDoList.firstChild);
+    var tr = document.createElement("tr");
+    tr.id = task.toString();
+    let d = new Date(task.dateCreated);
+    let shortDate = d.getFullYear() + "-" + (d.getMonth() < 10 ? "0" : "") + d.getMonth() + "-" + d.getDate();
+    tr.innerHTML = `<td>${task.category}</td><td>${task.name}</td><td>${shortDate}</td>`;
+    this.setTaskDoneFlag(tr, task.done);
+    if (this.$toDoList.tBodies[0].hasChildNodes()) {
+      this.$toDoList.tBodies[0].insertBefore(tr, this.$toDoList.tBodies[0].firstChild);
     } else {
-      this.$toDoList.appendChild(li);
+      this.$toDoList.tBodies[0].appendChild(tr);
     }
   }
 
-  View.prototype.setTaskDoneFlag = function (listItem, isDone) {
+  View.prototype.setTaskDoneFlag = function (el, isDone) {
     if (isDone) {
-      listItem.classList.add("completed");
+      el.classList.add("completed");
     }
     else {
-      listItem.classList.remove("completed");
+      el.classList.remove("completed");
     }
   }
 
@@ -88,7 +90,7 @@
     let allCats = this._allTasks.map(task => task.category);
     allCats.forEach(x=>console.log(x));
     allCats = allCats.filter((cat, i, arr) => arr.indexOf(cat) === i);//remove duplicates
-    if (allCats.filter(x => x.toLowerCase().trim() === "general") !== -1) {
+    if (allCats.filter(x => x.toLowerCase().trim() === "general").length == 0) {
       allCats.unshift("General");
     }
     allCats.sort((a, b) => a < b);
@@ -149,6 +151,13 @@
     var self = this;
     self.model = model;
     self.view = view;
+    
+    view.$form.addEventListener("submit", saveTaskHandler);
+    view.$createDummyTasks.addEventListener("click", createDummyTasks);
+    view.$clearTasks.addEventListener("click", clearTasksHandler);
+    view.$toDoList.addEventListener("click", taskDoneHandler);
+    window.addEventListener("storage", storageHandler);
+    view.refreshList(model.getTaskList());
     //populate categories in the view
     self.updateCategoryCombo = function () {
       self.model.getCategories().forEach(function(cat) {
@@ -156,13 +165,6 @@
       });
     }
     self.updateCategoryCombo();
-
-    view.$form.addEventListener("submit", saveTaskHandler);
-    view.$createDummyTasks.addEventListener("click", createDummyTasks);
-    view.$clearTasks.addEventListener("click", clearTasksHandler);
-    view.$toDoList.addEventListener("click", taskDoneHandler);
-    window.addEventListener("storage", storageHandler);
-    view.refreshList(model.getTaskList());
 
     //event handlers
     function saveTaskHandler(evt) {
@@ -177,20 +179,24 @@
 
     function taskDoneHandler(evt) {
       //find the li that was clicked
-      let foundItOrList = false, li;
-      li = evt.target;
+      let foundItOrList = false, tgt;
+      tgt = evt.target;
       while (!foundItOrList) {
         
-        if (li.nodeName.toLowerCase() === "li") {
+        if (tgt.nodeName.toLowerCase() === "tr") {
           foundItOrList = true;
           //mark the task done
-          let task = self.model.getTaskById(li.id);
+          let task = self.model.getTaskById(tgt.id);
           task.done = !task.done;
           model.saveItem(task);
-          view.setTaskDoneFlag(li, task.done);
+          view.setTaskDoneFlag(tgt, task.done);
         }
-        else if (li.id === "toDoList" || li.nodeName.toLowerCase() === "html")
+        else if (tgt.id === "toDoList" || tgt.nodeName.toLowerCase() === "html") {
           foundItOrList = true;
+        }          
+        else {
+          tgt = tgt.parentNode;
+        }
       }
       
     }
