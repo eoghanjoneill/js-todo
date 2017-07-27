@@ -1,0 +1,21 @@
+[
+ {
+   "listId": 1234,
+   "listName": "Eoghan's list",
+   "toDoList": [
+    {
+      "taskId": 1,
+      "taskName": "do the dishes"
+    },
+    {
+      "taskId": 2,
+      "taskName": "water the dogs"
+    }
+   ]
+ },
+  {
+    "listId": 5678,
+    "listName": "The other guy's list",
+    "toDoList": []
+  }
+]

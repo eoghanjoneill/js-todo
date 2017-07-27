@@ -4,14 +4,15 @@
   "description": "Learn JavaScript with a TODO list",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/eoghanjoneill/js-todo.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "Eoghan O'Neill",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/eoghanjoneill/js-todo/issues"
