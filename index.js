@@ -1,5 +1,5 @@
 var http = require("http");
-var toDoListService = require("./lib/toDoLists.js");
+var toDoListService = require("./lib/dbAccess.js");
 var resGen = require("./lib/responseGenerator.js");
 
 var server = http.createServer(function (req, res) {
@@ -19,6 +19,7 @@ var server = http.createServer(function (req, res) {
   //res.end("The current time is " + new Date(Date.now()).toISOString());
   var reAllLists = /^\/toDoLists\/?$/i;
   var reListSearch = /^\/toDoLists\/(\d+)\/?$/i;
+  var reAddToDo = /^\/toDoLists\/add\/(.+)$/i;
   if(_url = reAllLists.exec(req.url)) {
     toDoListService.getToDoLists (function (error, data) {
       if (error) {
@@ -44,6 +45,14 @@ var server = http.createServer(function (req, res) {
         resGen.sendJson(data, res);
       }      
     });    
+  }
+  else if (_url = reAddToDo.exec(req.url)) {
+    var name = _url[1];
+    var person = {};
+    person.name = name;
+    person.age = Math.floor((Math.random() * 100) + 1);
+    toDoListService.insertSomething(person);
+    resGen.send200("added summat", res);
   }
   else {
     //try to send static file

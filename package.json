@@ -17,5 +17,14 @@
   "bugs": {
     "url": "https://github.com/eoghanjoneill/js-todo/issues"
   },
-  "homepage": "https://github.com/eoghanjoneill/js-todo#readme"
+  "homepage": "https://github.com/eoghanjoneill/js-todo#readme",
+  "dependencies": {
+    "colors": "^1.1.2",
+    "mongodb": "^2.2.30"
+  },
+  "directories": {
+    "lib": "lib",
+    "test": "tests"
+  },
+  "devDependencies": {}
 }
