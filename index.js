@@ -20,6 +20,8 @@ var server = http.createServer(function (req, res) {
   var reAllLists = /^\/toDoLists\/?$/i;
   var reListSearch = /^\/toDoLists\/(\d+)\/?$/i;
   var reAddToDo = /^\/toDoLists\/add\/(.+)$/i;
+  var reUpsertPerson = /^\/people\/add\/(.+)$/i;
+
   if(_url = reAllLists.exec(req.url)) {
     toDoListService.getToDoLists (function (error, data) {
       if (error) {
@@ -46,13 +48,21 @@ var server = http.createServer(function (req, res) {
       }      
     });    
   }
-  else if (_url = reAddToDo.exec(req.url)) {
+  else if (_url = reUpsertPerson.exec(req.url)) {
     var name = _url[1];
     var person = {};
     person.name = name;
     person.age = Math.floor((Math.random() * 100) + 1);
-    toDoListService.insertSomething(person);
-    resGen.send200("added summat", res);
+    toDoListService.upsertPerson(person, function(error) {
+      if(error) {
+        resGen.send500(error.toString(), res);
+      }
+      else {
+        resGen.send200("added summat", res);
+      }      
+    });
+    //toDoListService.insertSomething(person);
+    
   }
   else {
     //try to send static file
