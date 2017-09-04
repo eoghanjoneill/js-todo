@@ -2,10 +2,10 @@
   "name": "js-todo",
   "version": "1.0.0",
   "description": "Learn JavaScript with a TODO list",
-  "main": "index.js",
+  "main": "bin\\www",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js"
+    "start": "node ./bin/www"
   },
   "repository": {
     "type": "git",
@@ -19,8 +19,15 @@
   },
   "homepage": "https://github.com/eoghanjoneill/js-todo#readme",
   "dependencies": {
+    "body-parser": "^1.17.2",
     "colors": "^1.1.2",
-    "mongodb": "^2.2.30"
+    "cookie-parser": "^1.4.3",
+    "debug": "^3.0.1",
+    "express": "^4.15.4",
+    "mongodb": "^2.2.30",
+    "morgan": "^1.8.2",
+    "pug": "^2.0.0-rc.3",
+    "serve-favicon": "^2.4.3"
   },
   "directories": {
     "lib": "lib",

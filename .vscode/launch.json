@@ -4,26 +4,36 @@
   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
-    
     {
       "type": "chrome",
       "request": "launch",
       "name": "Launch Chrome",
-      "file": "${workspaceRoot}/index.html",                       
-      "webRoot": "${workspaceRoot}"
+      "url": "http://localhost:3000/home.html",
+      "webRoot": "${workspaceRoot}/public"
     },
     {
       "type": "node",
       "request": "launch",
-      "name": "Launch Program",
-      "program": "${workspaceRoot}\\index.js"
+      "name": "Launch Node",
+      "program": "${workspaceRoot}\\bin\\www",
+      "env": {
+        "DEBUG":"myapp:*",
+        "PORT":"3000"
+      }
     },
     {
       "type": "node",
       "request": "attach",
-      "name": "Attach to Process",
+      "name": "Attach to Node",
+      "protocol": "inspector",
       "address": "localhost",
       "port": 5858
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Compound",
+      "configurations": ["Launch Node", "Launch Chrome"]
     }
   ]
 }
