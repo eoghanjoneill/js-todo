@@ -15,7 +15,7 @@ var reAddToDo = /^\/toDoLists\/add\/(.+)$/i;
 var reUpsertPerson = /^\/people\/add\/(.+)$/i;*/
 
 router.get(/^\/toDoLists\/?$/i, getToDoListHandler);
-router.get(/^\/toDoLists\/(\d+)\/?$/i, getToDoListByNameHandler);
+router.get(/^\/toDoLists\/(\w+)\/?$/i, getToDoListByNameHandler);
 router.post(/^\/toDoLists\/?$/i, postUpsertToDoListHandler);
 module.exports = router;
 

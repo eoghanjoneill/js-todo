@@ -17,7 +17,7 @@
       "name": "Launch Node",
       "program": "${workspaceRoot}\\bin\\www",
       "env": {
-        "DEBUG":"myapp:*",
+        "DEBUG":"js-todo:*",
         "PORT":"3000"
       }
     },
