@@ -78,6 +78,7 @@
 
     this._allTasks = []; //initialise task array
     this._userName = "Eoghan";
+    this._lastSaved = Date.now();
   }
 
   ToDoList.prototype.getTaskList = function (forceRefresh) {
@@ -117,6 +118,10 @@
     //save to local storage
     localStorage.setItem(task.toString(), JSON.stringify(task));
 
+    saveToDB("To-do list saved to database.", callback);
+  }
+  
+  ToDoList.prototype.saveToDB = function(message, callback) {
     //save to db
     var xhttp = new XMLHttpRequest();
     xhttp.open("POST", "http://localhost:3000/toDoLists/", true);
@@ -125,16 +130,32 @@
       if (xhttp.readyState == XMLHttpRequest.DONE && xhttp.status == 200) {
         //request finished - do something?
         if (typeof callback == "function") {
-          callback("To-do list saved to database.")
+          callback(message);
         }
       }
     }
     xhttp.send(JSON.stringify(this));
   }
-  
-  ToDoList.prototype.deleteAllTasks = function() {
+
+  ToDoList.prototype.getFromDB = function(message, callback) {
+    //save to db
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("GET", `http://localhost:3000/toDoLists/${this._userName}`, true);    
+    xhttp.onreadystatechange = function() {
+      if (xhttp.readyState == XMLHttpRequest.DONE && xhttp.status == 200) {
+        //request finished - do something?
+        if (typeof callback == "function") {
+          callback(message);
+        }
+      }
+    }
+    xhttp.send(JSON.stringify(this));
+  }
+
+  ToDoList.prototype.deleteAllTasks = function(callback) {
     this._allTasks.length = 0;
     localStorage.clear();
+    saveToDB("All items deleted", callback);
   }
 
   ToDoList.prototype.getTaskById = function(taskId) {
@@ -197,7 +218,7 @@
       evt.preventDefault();    
     
       var newTask = new ToDoTask({name: self.view.$newTask.value, category: self.view.$catSelect.value});
-      self.model.saveItem(newTask, self.view.setInfoMessage);
+      self.model.saveItem(newTask, function(message) {self.view.setInfoMessage(message)});
       self.view.addItemToList(newTask);      
       self.view.addCatToCombo(view.$catSelect.value);
       self.view.$newTask.value = "";
@@ -214,7 +235,7 @@
           //mark the task done
           let task = self.model.getTaskById(tgt.id);
           task.done = !task.done;
-          model.saveItem(task, self.view.setInfoMessage);
+          model.saveItem(task, function(message) {self.view.setInfoMessage(message)});
           view.setTaskDoneFlag(tgt, task.done);
         }
         else if (tgt.id === "toDoList" || tgt.nodeName.toLowerCase() === "html") {
