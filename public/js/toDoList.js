@@ -197,7 +197,7 @@
       evt.preventDefault();    
     
       var newTask = new ToDoTask({name: self.view.$newTask.value, category: self.view.$catSelect.value});
-      self.model.saveItem(newTask, self.view.setInfoMessage);
+      self.model.saveItem(newTask, function(message) {self.view.setInfoMessage(message)});
       self.view.addItemToList(newTask);      
       self.view.addCatToCombo(view.$catSelect.value);
       self.view.$newTask.value = "";
@@ -214,7 +214,7 @@
           //mark the task done
           let task = self.model.getTaskById(tgt.id);
           task.done = !task.done;
-          model.saveItem(task, self.view.setInfoMessage);
+          model.saveItem(task, function(message) {self.view.setInfoMessage(message)});
           view.setTaskDoneFlag(tgt, task.done);
         }
         else if (tgt.id === "toDoList" || tgt.nodeName.toLowerCase() === "html") {
