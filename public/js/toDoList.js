@@ -78,23 +78,42 @@
 
     this._allTasks = []; //initialise task array
     this._userName = "Eoghan";
-    this._lastSaved = Date.now();
+    this._lastSaved = null;
   }
 
-  ToDoList.prototype.getTaskList = function (forceRefresh) {
+  ToDoList.prototype.getTaskList = function (forceRefresh, callback) {
     if (forceRefresh) {
       this._allTasks.length = 0
     }
 
-    if (!this._allTasks.length) {      
-      var i = localStorage.length;
-      while (i--) {
-        this._allTasks.push(ToDoTask.prototype.fromJSON(localStorage.getItem(localStorage.key(i))));
-      }
-      this._allTasks.sort((x,y) => x.dateCreated >= y.dateCreated);
+    if (!this._allTasks.length) {
+      var localList, listToLoad;
+      localList = JSON.parse(localStorage.getItem(this._userName));
+      var that = this;
+      this.getFromDB((dbList) => {
+        if (localList && dbList) {
+          if (localList._lastSaved > dbList._lastSaved) {
+            listToLoad = localList;
+          }
+          else {
+            listToLoad = dbList;
+          }
+        }
+        else {
+          listToLoad = localList || dbList;
+        }
+
+        if (listToLoad) {
+          var i = listToLoad._allTasks.length;
+          while (i--) {
+            this._allTasks.push(listToLoad._allTasks[i]);
+          }
+        }
+
+        this._allTasks.sort((x,y) => x.dateCreated >= y.dateCreated);
+        callback(this._allTasks);
+      });     
     }
-    
-    return this._allTasks;
   }
 
   ToDoList.prototype.getCategories = function () {
@@ -114,17 +133,19 @@
     if (!this._allTasks.contains(task)) {
       this._allTasks.push(task);
     }
+
+    this._lastSaved = Date.now();
     
     //save to local storage
-    localStorage.setItem(task.toString(), JSON.stringify(task));
+    localStorage.setItem(this._userName, JSON.stringify(this));
 
-    saveToDB("To-do list saved to database.", callback);
+    this.saveToDB("To-do list saved to database.", callback);
   }
   
   ToDoList.prototype.saveToDB = function(message, callback) {
     //save to db
     var xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "http://localhost:3000/toDoLists/", true);
+    xhttp.open("POST", "./toDoLists/", true);
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.onreadystatechange = function() {
       if (xhttp.readyState == XMLHttpRequest.DONE && xhttp.status == 200) {
@@ -137,25 +158,22 @@
     xhttp.send(JSON.stringify(this));
   }
 
-  ToDoList.prototype.getFromDB = function(message, callback) {
-    //save to db
+  ToDoList.prototype.getFromDB = function(callback) {
     var xhttp = new XMLHttpRequest();
-    xhttp.open("GET", `http://localhost:3000/toDoLists/${this._userName}`, true);    
+    xhttp.open('GET', `./toDoLists/${this._userName}`, true);
     xhttp.onreadystatechange = function() {
-      if (xhttp.readyState == XMLHttpRequest.DONE && xhttp.status == 200) {
-        //request finished - do something?
-        if (typeof callback == "function") {
-          callback(message);
+        if (xhttp.readyState == XMLHttpRequest.DONE && xhttp.status == 200) {
+            var obj = JSON.parse(xhttp.responseText);
+            callback(obj);
         }
-      }
-    }
-    xhttp.send(JSON.stringify(this));
+    };
+    xhttp.send(null);
   }
 
   ToDoList.prototype.deleteAllTasks = function(callback) {
     this._allTasks.length = 0;
     localStorage.clear();
-    saveToDB("All items deleted", callback);
+    this.saveToDB("All items deleted", callback);
   }
 
   ToDoList.prototype.getTaskById = function(taskId) {
@@ -204,7 +222,7 @@
     view.$clearTasks.addEventListener("click", clearTasksHandler);
     view.$toDoList.addEventListener("click", taskDoneHandler);
     window.addEventListener("storage", storageHandler);
-    view.refreshList(model.getTaskList());
+    model.getTaskList(true, taskList => view.refreshList(taskList));
     //populate categories in the view
     self.updateCategoryCombo = function () {
       self.model.getCategories().forEach(function(cat) {
@@ -255,7 +273,7 @@
     function clearTasksHandler(evt) {
         evt.preventDefault();
         self.model.deleteAllTasks();
-        self.view.refreshList(model.getTaskList(true));
+        self.model.getTaskList(true, taskList => self.view.refreshList(taskList));        
     }
 
     function createDummyTasks(evt) {
@@ -272,7 +290,7 @@
       model.saveItem(task3);
       self.updateCategoryCombo();
 
-      view.refreshList(model.getTaskList());
+      model.getTaskList(true, taskList => view.refreshList(taskList));      
     }   
   } 
 
