@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+//start with terminal command: set DEBUG=myapp:* & set PORT=3999 & npm start
+
 /**
  * Module dependencies.
  */
