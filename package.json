@@ -33,5 +33,7 @@
     "lib": "lib",
     "test": "tests"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "request": "^2.82.0"
+  }
 }
