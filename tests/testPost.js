@@ -3,7 +3,8 @@ var request = require("request");
 var HEROES = {
     _userName: "HeroArrayTest",
     heroes: [
-    { id: 0, name: 'Zero'},
+      { id: 0, name: 'Zero'},
+      { id: 1, name: 'Numero Uno'},
       { id: 11, name: 'Hercules'},
       { id: 12, name: 'Aeneas'},
       { id: 13, name: 'Romulus'},
