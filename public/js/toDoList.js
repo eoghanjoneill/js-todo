@@ -42,7 +42,7 @@
     var tr = document.createElement("tr");
     tr.id = task.toString();
     let d = new Date(task.dateCreated);
-    let shortDate = d.getFullYear() + "-" + (d.getMonth() < 10 ? "0" : "") + d.getMonth() + "-" + d.getDate();
+    let shortDate = d.getFullYear() + "-" + (d.getMonth() + 1 < 10 ? "0" : "") + (d.getMonth() + 1) + "-" + d.getDate();
     tr.innerHTML = `<td>${task.category}</td><td>${task.name}</td><td>${shortDate}</td>`;
     this.setTaskDoneFlag(tr, task.done);
     if (this.$toDoList.tBodies[0].hasChildNodes()) {
@@ -79,6 +79,7 @@
     this._allTasks = []; //initialise task array
     this._userName = "Eoghan";
     this._lastSaved = null;
+    this._apiUrl = "./api/toDoLists/"
   }
 
   ToDoList.prototype.getTaskList = function (forceRefresh, callback) {
@@ -145,7 +146,7 @@
   ToDoList.prototype.saveToDB = function(message, callback) {
     //save to db
     var xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "./toDoLists/", true);
+    xhttp.open("POST", this._apiUrl, true);
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.onreadystatechange = function() {
       if (xhttp.readyState == XMLHttpRequest.DONE && xhttp.status == 200) {
@@ -160,7 +161,7 @@
 
   ToDoList.prototype.getFromDB = function(callback) {
     var xhttp = new XMLHttpRequest();
-    xhttp.open('GET', `./toDoLists/${this._userName}`, true);
+    xhttp.open('GET', `${this._apiUrl}${this._userName}`, true);
     xhttp.onreadystatechange = function() {
         if (xhttp.readyState == XMLHttpRequest.DONE && xhttp.status == 200) {
             var obj = JSON.parse(xhttp.responseText);
