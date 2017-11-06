@@ -38,7 +38,7 @@
       "name": "Attach to Node",
       "protocol": "inspector",
       "address": "localhost",
-      "port": 5858
+      "port": 3999
     }
   ],
   "compounds": [
