@@ -42,7 +42,7 @@
     var tr = document.createElement("tr");
     tr.id = task.toString();
     let d = new Date(task.dateCreated);
-    let shortDate = d.getFullYear() + "-" + (d.getMonth() + 1 < 10 ? "0" : "") + (d.getMonth() + 1) + "-" + d.getDate();
+    let shortDate = this.formatDateForPrint(d);
     tr.innerHTML = `<td>${task.category}</td><td>${task.name}</td><td>${shortDate}</td>`;
     this.setTaskDoneFlag(tr, task.done);
     if (this.$toDoList.tBodies[0].hasChildNodes()) {
@@ -50,6 +50,13 @@
     } else {
       this.$toDoList.tBodies[0].appendChild(tr);
     }
+  }
+
+  View.prototype.formatDateForPrint = function(d) {
+    let dateString = d.getFullYear() + "-"
+      + (d.getMonth() + 1 < 10 ? "0" : "") + (d.getMonth() + 1)+ "-"
+      + (d.getDate() < 10 ? "0": "") + d.getDate();
+    return dateString;
   }
 
   View.prototype.setTaskDoneFlag = function (el, isDone) {
