@@ -10,6 +10,6 @@ var router = express.Router();
 router.get("/", (req, res) => res.sendFile(path.join(__dirname, "../public/home.html")));
 /*var reAllLists = /^\/toDoLists\/?$/i;
 var reListSearch = /^\/toDoLists\/(\d+)\/?$/i;
-var reAddToDo = /^\/toDoLists\/add\/(.+)$/i;
-var reUpsertPerson = /^\/people\/add\/(.+)$/i;*/
+var reAddToDo = /^\/toDoLists\/add\/(.+)$/i;*/
+
 module.exports = router;
