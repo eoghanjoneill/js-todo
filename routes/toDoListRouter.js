@@ -42,7 +42,7 @@ function postUpsertToDoListHandler(req, res, next) {
       resGen.send500("Error saving list to database.", res);
     }    
     else {
-      resGen.send200("Saved list", res);
+      resGen.sendJson({status: true, error: null, message: "Saved list"}, res);
     }
   });
 }

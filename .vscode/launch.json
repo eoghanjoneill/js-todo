@@ -12,8 +12,7 @@
       "runtimeArgs": [
         "run-script",
         "debug"
-      ],
-      "port": 9229
+      ]
     },
   {
     "type": "chrome",
@@ -48,8 +47,7 @@
       "request": "attach",
       "name": "Attach to Node",
       "protocol": "inspector",
-      "address": "localhost",
-      "port": 3999
+      "address": "localhost"
     }
   ],
   "compounds": [
