@@ -8,6 +8,7 @@ var bodyParser = require('body-parser');
 var index = require('./routes/index');
 var users = require('./routes/users');
 var toDoListRouter = require('./routes/toDoListRouter.js')
+var database = require('./lib/database');
 
 var app = express();
 
@@ -50,6 +51,25 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.render('error');
   
+});
+
+if (process.platform === "win32") {
+  require("readline").createInterface({
+      input: process.stdin,
+      output: process.stdout
+  }).on("SIGINT", () => {
+      console.log('SIGINT: Closing MongoDB connection');
+      database.close();
+  });
+}
+
+process.on('SIGINT', () => {
+  console.log('SIGINT: Closing MongoDB connection');
+  database.close();
+});
+
+database.open(() => {
+  // todo: seed the database
 });
 
 module.exports = app;
