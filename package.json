@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "set DEBUG=js-todo:* & set PORT=3999 & node ./bin/www",
-    "start-linux": "DEBUG=js-todo:* PORT=3999 node ./bin/www --inspect"
+    "start-linux": "DEBUG=js-todo:* PORT=3999 nodemon ./bin/www -w app.js -w ./database -w ./lib -w ./routes -w ./public"
   },
   "repository": {
     "type": "git",
@@ -25,8 +25,9 @@
     "debug": "^3.0.1",
     "express": "^4.15.4",
     "mongodb": "^2.2.30",
+    "mongoose": "^5.0.3",
     "morgan": "^1.8.2",
-    "pug": "^2.0.0-rc.3",
+    "pug": "^2.0.0-rc.4",
     "serve-favicon": "^2.4.3"
   },
   "directories": {
