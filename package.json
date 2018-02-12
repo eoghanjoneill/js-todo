@@ -6,7 +6,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "set DEBUG=js-todo:* & set PORT=3999 & node ./bin/www",
-    "start-linux": "DEBUG=js-todo:* PORT=3999 nodemon ./bin/www -w app.js -w ./database -w ./lib -w ./routes -w ./public"
+    "start-linux": "DEBUG=js-todo:* PORT=3999 nodemon ./bin/www --inspect",
+    "start-linux-more-watches": "DEBUG=js-todo:* PORT=3999 nodemon ./bin/www -w app.js -w ./database -w ./lib -w ./routes -w ./public",
+    "start-mongo": "sudo service mongod start",
+    "stop-mongo": "sudo service mongod stop"
   },
   "repository": {
     "type": "git",
